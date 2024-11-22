@@ -1,7 +1,5 @@
 "use client"
-import { useState } from "react";
 import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,61 +10,55 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { redirect } from "next/navigation";
+import { useToast } from "@/components/hooks/use-toast";
 
 export default function LoginForm() {
-  const [error, setError] = useState("");
-  const router = useRouter();
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
-
-  const isValidEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
+  const { toast } = useToast();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    const fullName = `${firstName} ${lastName}`;
 
-    if (!isValidEmail(formData.email)) {
-      // Handle invalid email
-      return;
-    }
-    
-    if(!formData.password) {
-      // Handle invalid password
-      return;
-    }
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: fullName,
+        email,
+        password,
+      }),
+    });
 
-    try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        },
+    setIsLoading(false);
+
+    if (res.ok) {
+      // Show success toast
+      toast({
+      title: "Success",
+      description: "Account created successfully. Redirecting to login...",
+      variant: "default",
       });
-
-      if (res.status === 201) {
-        router.push("/login");
-      } else if(res.status === 400) {
-        setError("User already exists");
-        router.push("/login")
-      }else{
-        setError("An error occurred");
-      }    
-    } catch (error) {
-      setError("An error occurred");        
+      // Redirect to the login page
+      redirect("/login");
+    } else {
+      const errorData = await res.json();
+      // Show error toast
+      toast({
+      title: "Error",
+      description: errorData.message || "Failed to register",
+      variant: "destructive"
+      });
     }
-
   };
 
   return (
@@ -85,21 +77,21 @@ export default function LoginForm() {
                 <div className="grid gap-2">
                   <Label htmlFor="first-name">First name</Label>
                   <Input
-                    id="firstName"
+                    id="first-name"
                     placeholder="Max"
                     required
-                    value={formData.firstName}
-                    onChange={handleChange}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="last-name">Last name</Label>
                   <Input
-                    id="lastName"
+                    id="last-name"
                     placeholder="Robinson"
                     required
-                    value={formData.lastName}
-                    onChange={handleChange}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                   />
                 </div>
               </div>
@@ -110,8 +102,8 @@ export default function LoginForm() {
                   type="email"
                   placeholder="m@example.com"
                   required
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
@@ -120,14 +112,14 @@ export default function LoginForm() {
                   id="password"
                   type="password"
                   required
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Create an account
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Creating account..." : "Create an account"}
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" disabled={isLoading}>
                 Sign up with Google
               </Button>
             </div>

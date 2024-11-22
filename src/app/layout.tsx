@@ -1,9 +1,10 @@
-"use client";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { useState } from 'react';
-import { SparklesCore } from "@/components/ui/sparkles";
+import Sparkles from "../app/Components/SparklesCore"
+import { getServerSession  } from "next-auth";
+import SessionProvider from "@/app/utils/SessionProvider";
+import { Toaster } from "@/components/ui/toaster"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,38 +17,27 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-
-import SessionProvider from "@/app/utils/SessionProvider";
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  session,
 }: Readonly<{
   children: React.ReactNode;
-  session: any
 }>) {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const session = await getServerSession();
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative bg-black flex flex-col items-center justify-center overflow-hidden`}
       >
         <SessionProvider session={session}>
-        <div className={isDarkMode ? 'dark' : ''}>
+        <div className={'dark'}>
           <div className="w-full absolute inset-0 h-screen">
-            <SparklesCore
-              id="tsparticlesfullpage"
-              background="transparent"
-              minSize={0.6}
-              maxSize={1.4}
-              particleDensity={20}
-              className="w-full h-full"
-              particleColor="#FFFFFF"
-            />
+           <Sparkles /> 
           </div>
           <div className="relative z-20">
             {children}
           </div>
+          <Toaster />
         </div>
         </SessionProvider> 
       </body>

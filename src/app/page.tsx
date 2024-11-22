@@ -1,12 +1,21 @@
-"use client"
-import React from "react";
-import Image from "next/image";
+"use client";
+import React, { useEffect } from "react";
 import { Navbar } from "./Components/Navbar";
-import { HoveredLink} from "../components/ui/navbar-menu";
+import { HoveredLink } from "../components/ui/navbar-menu";
 import { Cover } from "@/components/ui/cover";
 import { useSession } from "next-auth/react";
+import { useToast } from "@/components/hooks/use-toast";
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const { toast } = useToast();
+  // Move the toast rendering logic here
+  useEffect(() => {
+    toast({
+      description: "Welcome to SmartGen",
+      title: "Hello there",
+    });
+  }, []);
   const menuItems = [
     {
       item: "Services",
@@ -46,17 +55,17 @@ export default function Home() {
   ];
 
   return (
-      <div className="relative bg-transparent">
-        <Navbar className="top-2" menuItems={menuItems} darkMode={true} />
-        <div className="h-screen flex flex-col items-center justify-center">
-          <h1 className="md:text-7xl text-3xl lg:text-8xl font-bold text-center text-white">
-            SmartGen
-          </h1>
-          <h2 className="text-4xl md:text-4xl lg:text-6xl font-semibold max-w-7xl mx-auto text-center mt-6 relative z-20 py-6 bg-clip-text text-transparent bg-gradient-to-b from-neutral-800 via-neutral-700 to-neutral-700 dark:from-neutral-800 dark:via-white dark:to-white">
-            One Stop Social Media-to-Ecommerce <Cover>Transformation</Cover> Hub
-          </h2>
-        </div>
-        {/* Content can be added here */}
+    <div className="relative bg-transparent">
+      <Navbar className="top-2" menuItems={menuItems} darkMode={true} />
+      <div className="h-screen flex flex-col items-center justify-center">
+        <h1 className="md:text-7xl text-3xl lg:text-8xl font-bold text-center text-white">
+          SmartGen
+        </h1>
+        <h2 className="text-4xl md:text-4xl lg:text-6xl font-semibold max-w-7xl mx-auto text-center mt-6 relative z-20 py-6 bg-clip-text text-transparent bg-gradient-to-b from-neutral-800 via-neutral-700 to-neutral-700 dark:from-neutral-800 dark:via-white dark:to-white">
+          One Stop Social Media-to-Ecommerce <Cover>Transformation</Cover> Hub
+        </h2>
       </div>
+      {/* Content can be added here */}
+    </div>
   );
 }
