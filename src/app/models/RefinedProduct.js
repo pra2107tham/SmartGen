@@ -25,16 +25,12 @@ const RefinedProductSchema = new Schema({
     description: {
       type: String,
     },
-    keywords: {
-      type: [String],
-    },
     category: {
       type: String,
       required: true,
     },
     processed_at: {
       type: Date,
-      default: Date.now,
     },
     amazon_ready_product: {
       type: Schema.Types.ObjectId,

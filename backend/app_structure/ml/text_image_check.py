@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 
 # Hugging Face API URL and Authorization Header
 API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
-headers = {"Authorization": "Bearer "}
+headers = {"Authorization": "Bearer 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"}
 
 # Create a Blueprint for the API
 text_image_check = Blueprint("text_image_check", __name__)

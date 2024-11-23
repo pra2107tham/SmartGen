@@ -4,98 +4,8 @@ from datetime import datetime, timedelta
 from database import db 
 import re  # Import the regex library
 
-
-# Create Blueprint for Instagram connection
-connect_insta = Blueprint('connect_insta', __name__)
-
-# Instagram API Credentials
-INSTAGRAM_CLIENT_ID = "1071555971386941"
-INSTAGRAM_CLIENT_SECRET = "72ffd47016434122b6f69a040e62b690"
-INSTAGRAM_REDIRECT_URI = "https://127.0.0.1/dashboard"
-
 API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
-headers = {"Authorization": "Bearer "}
-
-def get_short_lived_token(code):
-    """
-    Exchange authorization code for a short-lived access token.
-    """
-    url = "https://api.instagram.com/oauth/access_token"
-    data = {
-        "client_id": INSTAGRAM_CLIENT_ID,
-        "client_secret": INSTAGRAM_CLIENT_SECRET,
-        "grant_type": "authorization_code",
-        "redirect_uri": INSTAGRAM_REDIRECT_URI,
-        "code": code,
-    }
-    response = requests.post(url, data=data)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Error fetching short-lived token: {response.status_code} {response.text}")
-        return None
-
-
-def exchange_for_long_lived_token(short_lived_token):
-    """
-    Exchange a short-lived token for a long-lived token.
-    """
-    url = "https://graph.instagram.com/access_token"
-    params = {
-        "grant_type": "ig_exchange_token",
-        "client_secret": INSTAGRAM_CLIENT_SECRET,
-        "access_token": short_lived_token,
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Error fetching long-lived token: {response.status_code} {response.text}")
-        return None
-
-
-def fetch_user_details(access_token):
-    """
-    Fetch user details from Instagram Graph API.
-    """
-    url = "https://graph.instagram.com/me"
-    params = {
-        "fields": "id,username,biography,media_count,account_type",
-        "access_token": access_token,
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Error fetching user details: {response.status_code} {response.text}")
-        return None
-
-
-def fetch_media_details(access_token):
-    """
-    Fetch media details from Instagram Graph API.
-    """
-    url = "https://graph.instagram.com/me/media"
-    params = {
-        "fields": "id,caption,media_type,media_url,like_count,comments_count",
-        "access_token": access_token,
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        return response.json().get("data", [])
-    else:
-        print(f"Error fetching media details: {response.status_code} {response.text}")
-        return None
-
-
-
-from flask import Blueprint, request, jsonify
-import requests
-from datetime import datetime
-import re
-
-API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
-HEADERS = {"Authorization": "Bearer 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"}
+headers = {"Authorization": "Bearer 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"}
 
 # Create Blueprint for Instagram connection
 connect_insta = Blueprint('connect_insta', __name__)
@@ -208,6 +118,9 @@ def connect_to_insta():
             return jsonify({"error": "Failed to fetch user details from Instagram"}), 500
 
         # Optional: Store or use the email for further purposes (e.g., associating with the user in your system)
+        user_id = db.users.find_one({"email": email}).get("_id")
+        if not user_id:
+            return jsonify({"error": "User not found"}), 404
 
         # Fetch the user's media
         media_data = fetch_media_details(access_token)
@@ -230,19 +143,19 @@ def connect_to_insta():
                     "inputs": media_url,  # Provide the media URL
                     "parameters": {"candidate_labels":[caption]}  # Provide the caption text
                 }
-            clip_response = requests.post("http://localhost:8000/api/ml/text-image-check", headers=headers, json=payload)
+            # clip_response = requests.post("http://localhost:8000/api/ml/text-image-check", headers=headers, json=payload)
 
-            if clip_response.status_code != 200:
-                print(f"Skipping media {media_id} due to failed analysis: {clip_response.text}")
-                continue
+            # if clip_response.status_code != 200:
+            #     print(f"Skipping media {media_id} due to failed analysis: {clip_response.text}")
+            #     continue
 
-            clip_result = clip_response.json()
-            score = clip_result[0].get("score",0)  # Default to 0 if no score
+            # clip_result = clip_response.json()
+            # score = clip_result[0].get("score",0)  # Default to 0 if no score
 
-            # Discard media if score is below threshold
-            if score < 0.35:
-                print(f"Discarding media {media_id} due to low consistency score: {score}")
-                continue
+            # # Discard media if score is below threshold
+            # if score < 0.35:
+            #     print(f"Discarding media {media_id} due to low consistency score: {score}")
+            #     continue
 
             if media_id:
                 media_doc = {
@@ -253,7 +166,7 @@ def connect_to_insta():
                     "media_url": media_url,
                     "like_count": media.get("like_count"),
                     "comments_count": media.get("comments_count"),
-                    "email": email,  # Use the email provided in the input
+                    "user_id": user_id,  # Reference the user by ObjectId
                     "created_at": datetime.now()
                 }
 

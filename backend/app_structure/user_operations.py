@@ -100,6 +100,3 @@ def update_media_item():
     db.media.update_one({"media_id": media_id}, {"$set": updates})
 
     return jsonify({"message": "Media updated successfully", "updated_fields": updates}), 200
-
-
-    

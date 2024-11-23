@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import { type } from 'os';
 
 const UserSchema = new Schema({
     name: {
@@ -33,6 +34,10 @@ const UserSchema = new Schema({
     },
     access_token_expiry: {
         type: Date,
+        required: false
+    },
+    category: {
+        type: String,
         required: false
     },
     media: [{

@@ -49,7 +49,7 @@ export default function OverViewPage() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Total Revenue
+                    Total Valid Media Posts
                   </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -65,16 +65,13 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$45,231.89</div>
-                  <p className="text-xs text-muted-foreground">
-                    +20.1% from last month
-                  </p>
+                  <div className="text-2xl font-bold">26</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Subscriptions
+                    Products extracted from your Posts
                   </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -92,15 +89,15 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+2350</div>
+                  <div className="text-2xl font-bold">+17</div>
                   <p className="text-xs text-muted-foreground">
-                    +180.1% from last month
+                    
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sales</CardTitle>
+                  <CardTitle className="text-sm font-medium">Products needing Amazon Specific Details </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -116,7 +113,7 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+12,234</div>
+                  <div className="text-2xl font-bold">+11</div>
                   <p className="text-xs text-muted-foreground">
                     +19% from last month
                   </p>
@@ -125,7 +122,7 @@ export default function OverViewPage() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Active Now
+                    Active on Amazon Now
                   </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -141,9 +138,9 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+573</div>
+                  <div className="text-2xl font-bold">+7</div>
                   <p className="text-xs text-muted-foreground">
-                    +201 since last hour
+                    +$200 sales from last month
                   </p>
                 </CardContent>
               </Card>

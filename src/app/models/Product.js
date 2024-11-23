@@ -13,6 +13,11 @@ const ProductSchema = new Schema({
     ref: 'User', 
     required: true 
   },
+  media_id:{
+    type: [Schema.Types.ObjectId],
+    ref: 'Media',
+    required: true
+  },
   product_name: { 
     type: String, 
     required: true 
@@ -21,71 +26,21 @@ const ProductSchema = new Schema({
     type: String, 
     required: true 
   },
-  keywords: { 
+  media_url: { 
     type: [String], 
     required: true 
   },
-  images: { 
-    type: [String], 
-    required: true 
-  },
-  primary_image: { 
+  product_category: { 
     type: String, 
     required: true 
-  },
-  category: { 
-    type: String, 
-    required: true 
-  },
-  dimensions: {
-    height: { 
-      type: String, 
-      required: true 
-    },
-    width: { 
-      type: String, 
-      required: true 
-    },
-    depth: { 
-      type: String, 
-      required: true 
-    },
-    weight: { 
-      type: String, 
-      required: true 
-    }
   },
   price: { 
-    type: String, 
-    required: true 
-  },
-  stock_quantity: { 
     type: Number, 
-    required: true 
-  },
-  compliance_check: { 
-    type: Boolean, 
-    required: true 
-  },
-  amazon_listing_id: { 
-    type: String, 
-    unique: true 
-  },
-  listing_status: { 
-    type: String, 
-    required: true 
+    required: false 
   },
   brand: { 
     type: String, 
     required: true 
-  },
-  bullet_points: { 
-    type: [String], 
-    required: true 
-  },
-  asin: { 
-    type: String, 
-    unique: true 
   },
   created_at: { 
     type: Date, 

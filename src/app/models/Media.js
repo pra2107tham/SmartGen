@@ -13,7 +13,7 @@ const MediaSchema = new Schema({
   },
   media_type: {
     type: String,
-    enum: ["image", "video"],
+    enum: ["IMAGE", "VIDEO"],
     required: true,
   },
   media_url: {
@@ -26,15 +26,13 @@ const MediaSchema = new Schema({
   hashtags: {
     type: [String],
   },
-  engagement_metrics: {
-    likes: {
-      type: Number,
-      default: 0,
-    },
-    comments: {
-      type: Number,
-      default: 0,
-    },
+  likes: {
+    type: Number,
+    default: 0,
+  },
+  comments: {
+    type: Number,
+    default: 0,
   },
   created_at: {
     type: Date,
@@ -44,9 +42,9 @@ const MediaSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  refined_product: {
+  Product: {
     type: Schema.Types.ObjectId,
-    ref: "RefinedProduct", // Links to Refined Product schema
+    ref: "Product", // Links to Refined Product schema
   },
 });
 
