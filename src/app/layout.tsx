@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import "@radix-ui/themes/styles.css";
 import Sparkles from "../app/Components/SparklesCore"
 import { getServerSession  } from "next-auth";
 import SessionProvider from "@/app/utils/SessionProvider";

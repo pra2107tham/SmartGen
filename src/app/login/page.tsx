@@ -20,12 +20,13 @@ export default function Dashboard() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const session = useSession();
   const router = useRouter();
 
   useEffect(() => {
     if(session?.status == "authenticated"){
-      router.replace("/dashboard");
+      router.replace("/dashboard/overview");
     }
   }, [session, router]  
   )
@@ -37,14 +38,17 @@ export default function Dashboard() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (!isVallidEmail(email)) {
       setError("Please enter a valid email");
+      setLoading(false);
       return;
     }
 
     if (!password) {
       setError("Please enter a password");
+      setLoading(false);
       return;
     }
 
@@ -54,11 +58,11 @@ export default function Dashboard() {
       password,
     });
 
+    setLoading(false);
+
     if (res?.error) {
-      setError("Invalid email or password");
-      if(res?.url) router.replace("/dashboard")
-    }else{
-      setError("An error occurred. Please try again");
+      setError(res.error);
+      if(res?.url) router.replace("/dashboard");
     }
   };
 
@@ -103,8 +107,8 @@ export default function Dashboard() {
               />
             </div>
             {error && <p className="text-red-500">{error}</p>}
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
             </Button>
             <Button variant="outline" className="w-full text-white">
               Login with Google

@@ -14,7 +14,7 @@ INSTAGRAM_CLIENT_SECRET = "72ffd47016434122b6f69a040e62b690"
 INSTAGRAM_REDIRECT_URI = "https://127.0.0.1/dashboard"
 
 API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
-HEADERS = {"Authorization": f"Bearer YOUR_HUGGINGFACE_API_KEY"}
+headers = {"Authorization": "Bearer "}
 
 def get_short_lived_token(code):
     """
@@ -226,20 +226,18 @@ def connect_to_insta():
             hashtags = re.findall(r"#\w+", caption)
 
             # Analyze text-image consistency using Hugging Face
-            payload = {
-                "inputs": {
-                    "image": media_url,  # Provide the media URL
-                    "text": caption  # Provide the caption text
+            payload = { 
+                    "inputs": media_url,  # Provide the media URL
+                    "parameters": {"candidate_labels":[caption]}  # Provide the caption text
                 }
-            }
-            clip_response = requests.post(API_URL, headers=HEADERS, json=payload)
+            clip_response = requests.post("http://localhost:8000/api/ml/text-image-check", headers=headers, json=payload)
 
             if clip_response.status_code != 200:
                 print(f"Skipping media {media_id} due to failed analysis: {clip_response.text}")
                 continue
 
             clip_result = clip_response.json()
-            score = clip_result.get("score", 0)  # Default to 0 if no score
+            score = clip_result[0].get("score",0)  # Default to 0 if no score
 
             # Discard media if score is below threshold
             if score < 0.35:
@@ -260,9 +258,13 @@ def connect_to_insta():
                 }
 
                 # Insert or update media in database (replace `db` with your DB connection)
-                db.media.update_one(
-                    {"media_id": media_id}, {"$set": media_doc}, upsert=True
-                )
+                try:
+                    db.media.update_one(
+                        {"media_id": media_id}, {"$set": media_doc}, upsert=True
+                    )
+                except Exception as db_error:
+                    return jsonify({"error": f"Database error: {str(db_error)}"}), 500
+
                 media_ids.append(media_id)
 
         return jsonify({
@@ -276,5 +278,8 @@ def connect_to_insta():
 
 @connect_insta.route('/connected-users', methods=['GET'])
 def get_connected_users():
-    connected_users = list(db.users.find({"instagram_connected": True}, {"_id": 0}))
-    return jsonify({"connected_users": connected_users}), 200
+    try:
+        connected_users = list(db.users.find({"instagram_connected": True}, {"_id": 0}))
+        return jsonify({"connected_users": connected_users}), 200
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500

@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 
 # Hugging Face API URL and Authorization Header
 API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
-headers = {"Authorization": "Bearer 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"}
+headers = {"Authorization": "Bearer "}
 
 # Create a Blueprint for the API
 text_image_check = Blueprint("text_image_check", __name__)
@@ -16,8 +16,9 @@ def text_image_check_endpoint():
     """
     try:
         data = request.json
-        image_path = data.get("image_path")
-        parameters = data.get("parameters")
+        image_path = data["inputs"]
+        parameters = data["parameters"]
+        print(data)
 
         if not image_path or not parameters:
             return jsonify({"error": "Both 'image_path' and 'parameters' are required"}), 400
@@ -43,10 +44,8 @@ def text_image_check_endpoint():
 
         # Prepare payload for Hugging Face API
         payload = {
-            "inputs": {
-                "image": encoded_image,
-                "text": parameters["candidate_labels"][0]
-            }
+            "inputs": base64.b64encode(img).decode("utf-8"),
+            "parameters": data["parameters"],
         }
 
         # Send the request to Hugging Face API

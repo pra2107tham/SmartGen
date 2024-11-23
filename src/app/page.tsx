@@ -4,7 +4,7 @@ import { Navbar } from "./Components/Navbar";
 import { HoveredLink } from "../components/ui/navbar-menu";
 import { Cover } from "@/components/ui/cover";
 import { useSession } from "next-auth/react";
-import { useToast } from "@/components/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const { data: session, status } = useSession();
