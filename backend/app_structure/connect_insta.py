@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from database import db 
 import re  # Import the regex library
 
-API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
+API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-large-patch14"
 headers = {"Authorization": "Bearer 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"}
 
 # Create Blueprint for Instagram connection
@@ -135,27 +135,34 @@ def connect_to_insta():
             caption = media.get("caption", "")
             media_url = media.get("media_url")
 
+            shorten_response = requests.post("http://localhost:8000/api/ml/shorten-url", json={"url": media_url})
+            if shorten_response.status_code == 200:
+                media_url = shorten_response.json().get("shortened_url")
+            else:
+                print(f"Error shortening URL {media_url}: {shorten_response.text}")
+
             # Extract hashtags from the caption
             hashtags = re.findall(r"#\w+", caption)
 
             # Analyze text-image consistency using Hugging Face
+       
             payload = { 
                     "inputs": media_url,  # Provide the media URL
                     "parameters": {"candidate_labels":[caption]}  # Provide the caption text
                 }
-            # clip_response = requests.post("http://localhost:8000/api/ml/text-image-check", headers=headers, json=payload)
+            clip_response = requests.post("http://localhost:8000/api/ml/text-image-check", headers=headers, json=payload)
 
-            # if clip_response.status_code != 200:
-            #     print(f"Skipping media {media_id} due to failed analysis: {clip_response.text}")
-            #     continue
+            if clip_response.status_code != 200:
+                print(f"Skipping media {media_id} due to failed analysis: {clip_response.text}")
+                continue
 
-            # clip_result = clip_response.json()
-            # score = clip_result[0].get("score",0)  # Default to 0 if no score
+            clip_result = clip_response.json()
+            score = clip_result[0].get("score",0)  # Default to 0 if no score
 
-            # # Discard media if score is below threshold
-            # if score < 0.35:
-            #     print(f"Discarding media {media_id} due to low consistency score: {score}")
-            #     continue
+            # Discard media if score is below threshold
+            if score < 0.35:
+                print(f"Discarding media {media_id} due to low consistency score: {score}")
+                continue
 
             if media_id:
                 media_doc = {
